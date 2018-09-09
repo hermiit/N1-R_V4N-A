@@ -1,3 +1,3 @@
 # ***N1-R V4N-A***
 
-My first real attempt at python, along with a cyberpunk bartender to boot.
+A personal bot that I use, along with some VA-11 themes.
