@@ -15,7 +15,7 @@ async def on_message(message):
         await client.send_message(message.channel, msg)
 
     if message.content.startswith('**youok'):
-        msg = 'Doing good, {0.author.mention}.'.format(message)
+        msg = 'Doing fine, {0.author.mention}.'.format(message)
         await client.send_message(message.channel, msg)
 
 @client.event
