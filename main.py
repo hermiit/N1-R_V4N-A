@@ -43,7 +43,7 @@ async def on_message(message):
     if message.content.startswith('**drinktionary'):
         embedo=discord.Embed(title="Drinktionary", url=dnkurl, description="Here are the ingredients, please react with which number you want to use. (emoji :one:-:five:)", color=0x832297)
         embedo.set_author(name="Jill", url=julirl, icon_url=iconu)
-        embedo.set_thumbnail(url=mixurl)
+        embedo.set_image(url=mixurl)
         embedo.add_field(name=(1), value="Adelhyde", inline=True)
         embedo.add_field(name=(2), value="Bronson Extract", inline=True)
         embedo.add_field(name=(3), value="Powdered Delta", inline=True)
