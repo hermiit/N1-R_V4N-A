@@ -15,7 +15,7 @@ class Vector2:
         return sdif
 
     def scal(self,alp):
-        scalvec = Vector2(self.x*alp,self.y*alp)
+        scalvec = Vector2(self.x*alp, self.y*alp)
         return scalvec
 
     def components(self):
