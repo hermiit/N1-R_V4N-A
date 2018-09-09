@@ -3,7 +3,10 @@ import discord
 import requests
 client = discord.Client()
 
-TOKEN = 'NDg4MTA3OTIyMDg2NDI4Njcz.DnXyqg.U4kD8T39b8UV8IfGaCCV3WkmANA'
+#/ vars
+TOKEN = "NDg4MTA3OTIyMDg2NDI4Njcz.DnYIOg.rhIw0g63U2JygBTxCBeJTVhxhTw"
+iconu = "https://cdn.discordapp.com/avatars/488107922086428673/ac74d4af50b36a915400bcb648addb8a.png"
+testu = "https://google.com"
 
 #// main
 @client.event
@@ -16,9 +19,10 @@ async def on_message(message):
         msg = 'Hey, {0.author.mention}.'.format(message)
         await client.send_message(message.channel, msg)
 
-    if message.content.startswith('**youok'):
-        msg = 'Doing fine, {0.author.mention}.'.format(message)
-        await client.send_message(message.channel, msg)
+    if message.content.startswith('**embtest'):
+        embedo=discord.Embed( description="Embeds look pretty fine.", color=0x832297)
+        embedo.set_author(name="Jill", icon_url=iconu)
+        await client.send_message(message.channel, embed=embedo)
 
 @client.event
 async def on_ready():
