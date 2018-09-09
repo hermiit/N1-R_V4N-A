@@ -20,7 +20,7 @@ async def on_message(message):
         await client.send_message(message.channel, msg)
 
     if message.content.startswith('**embtest'):
-        embedo=discord.Embed( description="Embeds look pretty fine.", color=0x832297)
+        embedo=discord.Embed( description="Testing embed description.", color=0x832297)
         embedo.set_author(name="Jill", icon_url=iconu)
         await client.send_message(message.channel, embed=embedo)
 
