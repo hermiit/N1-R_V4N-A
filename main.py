@@ -2,13 +2,14 @@
 import discord
 import asyncio
 import time
-import requests
 from datetime import datetime, date, time
+import requests as reqs
 import json
 client = discord.Client()
 
 #/ vars
-TOKEN = ''
+TOKEN = 'NDg4MTA3OTIyMDg2NDI4Njcz.DoQaYw.sC9d5FYEifRKVGUUlLNiQRnnA34'
+api = 'https://api.roblox.com/'
 
 dnums = {
     ":one:"  : "Adelhyde",
@@ -37,6 +38,44 @@ testu = urls['Pages']['testu']
 julirl = urls['Pages']['julirl']
 dnkurl = urls['Pages']['dnkurl']
 
+#// Functions
+def checkrbx(msg):
+    if msg[:10] != '**rbxinfo ':
+        return False
+    plrid = int(msg[10:])
+    newreq = reqs.get(api + 'users/' + str(plrid))
+    if newreq.status_code == 200:
+        print('Sending info of id %d...' % plrid)
+        reqjs = newreq.json()
+        print(type(reqjs))
+        return reqjs
+    else:
+        print('error' + str(newreq))
+        return False
+
+def getthumb(id):
+    thumbapi = 'https://www.roblox.com/headshot-thumbnail/image'
+    newthumb = reqs.get(thumbapi,params={'userId': [id],'width': 420,'height': 420,'format': 'png'})
+    if newthumb.status_code < 400:
+        return newthumb.url
+    else:
+        return False
+
+def primgrp(id):
+    groupapi = 'https://www.roblox.com/Groups/GetPrimaryGroupInfo.ashx'
+    usrgrp = reqs.get(groupapi,params={'users': id['Username']})
+    user = id['Username']
+    print(usrgrp)
+    if usrgrp.status_code < 400:
+        usrjs = usrgrp.json()
+        if usrjs == {}:
+            print('User %s has no primary group!' % user)
+            return 'N/A'
+        else:
+            return usrjs['Username']['GroupName']
+    else:
+        return False
+
 #// main
 @client.async_event
 def on_message(message):
@@ -53,7 +92,22 @@ def on_message(message):
         embedo.set_author(name="Jill", icon_url=julico)
         yield from client.send_message(message.channel, embed=embedo)
 
-    if message.content.startswith('**drinktionary'):
+    if message.content.startswith('**rbxinfo '):
+        checkthis = checkrbx(message.content)
+        if checkthis and checkthis['Username'] != 'ROBLOX':
+            infostr = '**Username**: %s\n**User ID**: %d' % (checkthis['Username'],checkthis['Id'])
+            embed=discord.Embed(title="Quick Info for %s:" % checkthis['Username'], color=0xf02b39)
+            embed.set_author(name="Jill", url="https://roblox.com/users/" + str(checkthis['Id']), icon_url=julico)
+            embed.set_thumbnail(url=getthumb(checkthis['Id']))
+            embed.add_field(name='Username', value=checkthis['Username'], inline=True)
+            embed.add_field(name='User ID', value=str(checkthis['Id']), inline=True)
+            embed.add_field(name='Primary Group', value=primgrp(checkthis), inline=True)
+            yield from client.send_message(message.channel, embed=embed)
+        else:
+            infostr = 'Incorrect syntax! Correct usage: `**rbxinfo 261`'
+            yield from client.send_message(message.channel, content=infostr)
+
+    if message.content.startswith('**drinktionary'): # UNFINISHED
         embedo=discord.Embed(title="Drinktionary", url=dnkurl, description="Here are the ingredients, please post with which number you want to use. (emoji :one:-:five:)", color=0x832297)
         embedo.set_author(name="Jill", url=julirl, icon_url=julico)
         embedo.set_image(url=mixgif)
