@@ -43,50 +43,50 @@ dnkurl = urls['Pages']['dnkurl']
 
 #// Functions
 def checkrbx(msg):
-    presapi = 'https://www.roblox.com/presence/user'
-    usrapi  = 'https://api.roblox.com/users/'
-    if msg[:10] != '**rbxinfo ':
-        return False
+   presapi = 'https://www.roblox.com/presence/user'
+   usrapi  = 'https://api.roblox.com/users/'
+   if msg[:10] != '**rbxinfo ':
+      return False
 
-    plrid = int(msg[10:])
-    usrreq = reqs.get(usrapi + str(plrid))
-    presreq = reqs.get(presapi,params={'userId': plrid})
+   plrid = int(msg[10:])
+   usrreq = reqs.get(usrapi + str(plrid))
+   presreq = reqs.get(presapi,params={'userId': plrid})
 
-    if usrreq.status_code == 200 and presreq.status_code == 200:
-        print('Sending info of id %d...' % plrid)
-        reqjs = usrreq.json()
-        presjs = presreq.json()
-        reqjs['Presence'] = presjs['LastLocation']
-        print(type(reqjs))
-        return reqjs
-    else:
-        print('User request: %s' % str(usrreq))
-        print('Presence request: %s' % str(presreq))
-        return False
+   if usrreq.status_code == 200 and presreq.status_code == 200:
+      print('Sending info of id %d...' % plrid)
+      reqjs = usrreq.json()
+      presjs = presreq.json()
+      reqjs['Presence'] = presjs['LastLocation']
+      print(type(reqjs))
+      return reqjs
+   else:
+      print('User request: %s' % str(usrreq))
+      print('Presence request: %s' % str(presreq))
+      return False
 
 def getthumb(id):
-    thumbapi = 'https://www.roblox.com/headshot-thumbnail/image'
-    newthumb = reqs.get(thumbapi,params={'userId': [id],'width': 420,'height': 420,'format': 'png'})
-    if newthumb.status_code < 400:
-        return newthumb.url
-    else:
-        return False
+   thumbapi = 'https://www.roblox.com/headshot-thumbnail/image'
+   newthumb = reqs.get(thumbapi,params={'userId': [id],'width': 420,'height': 420,'format': 'png'})
+   if newthumb.status_code < 400:
+      return newthumb.url
+   else:
+      return False
 
 def primgrp(id):
-    groupapi = 'https://www.roblox.com/Groups/GetPrimaryGroupInfo.ashx'
-    usrgrp = reqs.get(groupapi,params={'users': id['Username']})
-    user = id['Username']
-    print(usrgrp)
-    if usrgrp.status_code < 400:
-        usrjs = usrgrp.json()
-        if usrjs == {}:
-            print('User %s has no primary group!' % user)
-            return 'N/A'
-        else:
-            print(usrjs)
-            return usrjs[user]['GroupName']
-    else:
-        return False
+   groupapi = 'https://www.roblox.com/Groups/GetPrimaryGroupInfo.ashx'
+   usrgrp = reqs.get(groupapi,params={'users': id['Username']})
+   user = id['Username']
+   print(usrgrp)
+   if usrgrp.status_code < 400:
+      usrjs = usrgrp.json()
+      if usrjs == {}:
+         print('User %s has no primary group!' % user)
+         return 'N/A'
+      else:
+         print(usrjs)
+         return usrjs[user]['GroupName']
+   else:
+      return False
 
 #// main
 @client.async_event
@@ -144,10 +144,10 @@ def on_message(message):
 
 @client.async_event
 def on_ready():
-    print('Logged in as')
-    print(client.user.name)
-    print(client.user.id)
-    print('Time to mix drinks and save lives.')
-    print('-----------------------------------')
+   print('Logged in as')
+   print(client.user.name)
+   print(client.user.id)
+   print('Time to mix drinks and save lives.')
+   print('-----------------------------------')
 
 client.run(TOKEN)
