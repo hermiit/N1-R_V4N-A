@@ -5,18 +5,36 @@ import requests as reqs
 
 # Functions
 def checkrbx(msg):
+    presapi = 'https://www.roblox.com/presence/user'
+    usrapi  = 'https://api.roblox.com/users/'
     if msg[:10] != '**rbxinfo ':
         return False
+
     plrid = int(msg[10:])
-    newreq = reqs.get(api + 'users/' + str(plrid))
-    if newreq.status_code == 200:
+    usrreq = reqs.get(usrapi + str(plrid))
+    presreq = reqs.get(presapi,params={'userId': plrid})
+
+    if usrreq.status_code == 200 and presreq.status_code == 200:
         print('Sending info of id %d...' % plrid)
-        reqjs = newreq.json()
+        reqjs = usrreq.json()
+        reqjs['Last Seen On'] = presreq
         print(type(reqjs))
         return reqjs
     else:
         print('error' + str(newreq))
         return False
+
+# getting the user's presence: https://presence.roblox.com/docs#!/Presence/post_v1_presence_users
+# request example: params={'userId': plrid}
+
+# api for username and id: https://api.roblox.com/docs/#Users/
+# request example: https://api.roblox.com/users/{userid}
+
+# api for a user's thumbnail: https://www.roblox.com/headshot-thumbnail/image
+# request example: params={'userId': [array of ids],'width': 420,'height': 420,'format': 'png'} returns: url(string)
+
+# api for a user's primary group: https://www.roblox.com/Groups/GetPrimaryGroupInfo.ashx
+# request example: https://www.roblox.com/Groups/GetPrimaryGroupInfo.ashx
 
 def getthumb(id):
     thumbapi = 'https://www.roblox.com/headshot-thumbnail/image'
