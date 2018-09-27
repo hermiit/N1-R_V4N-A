@@ -137,7 +137,7 @@ def primgrp(id):
 def on_message(message):
    # we do not want the bot to reply to itself
    if message.author == client.user:
-      return  
+      return
 
    # Normal
    if message.content.startswith('**hello'):
