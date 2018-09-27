@@ -43,6 +43,8 @@ julirl = urls['Pages']['julirl']
 dnkurl = urls['Pages']['dnkurl']
 
 #// Functions
+random.seed()
+
 def printf(string,*argv):
    print(string % (argv))
 
@@ -135,8 +137,9 @@ def primgrp(id):
 def on_message(message):
    # we do not want the bot to reply to itself
    if message.author == client.user:
-      return
+      return  
 
+   # Normal
    if message.content.startswith('**hello'):
       msg = 'Hey, <@%s>.' % message.author.id
       yield from client.send_message(message.channel, msg)
@@ -146,6 +149,36 @@ def on_message(message):
       embedo.set_author(name="Jill", icon_url=julico)
       yield from client.send_message(message.channel, embed=embedo)
 
+   if message.content.startswith('**cmds') or message.content.startswith('**commands'):
+      embedo=discord.Embed(title="Commands", url=dnkurl, description="Here are the commands for N1RV Ann-a v0.2.", color=0x832297)
+      embedo.set_author(name="Jill", url=julirl, icon_url=julico)
+      embedo.set_image(url=mixgif)
+      embedo.add_field(name='**cmds or **commands', value='View the list of available commands.', inline=False)
+      embedo.add_field(name='**hello', value='Basic test command.', inline=False)
+      embedo.add_field(name='**embtest', value='Embed test command.', inline=False)
+      embedo.add_field(name='**chance (int1) (int2)', value='Generates a random value from int1 to int2.', inline=False)
+      embedo.add_field(name='**rbxinfo (userid) or (username)', value='Attempts to find the info of a roblox user with the specified parameter.', inline=True)
+      yield from client.send_message(message.channel,embed=embedo)
+
+   if message.content.startswith('**chance '):
+      chances = parse(message.content)
+      authid = message.author.id
+      try:
+         cho1 = int(chances[1])
+         cho2 = int(chances[2])
+         
+         newint = random.randint(cho1,cho2)
+         chomsg = ('<@{}> `Selected: {}`').format(authid,newint)
+         printf('Random int: %d',newint)
+         yield from client.send_message(message.channel,chomsg)
+      except ValueError:
+         errmsg = ('<@{}> Please use an integer for your range! Example: `**chance 1 50`').format(authid)
+         yield from client.send_message(message.channel,errmsg)
+      except IndexError:
+         errmsg = ('<@{}> Please use an integer for your range! Example: `**chance 1 50`').format(authid)
+         yield from client.send_message(message.channel,errmsg)
+
+   # API
    if message.content.startswith('**rbxinfo '):
       checkthis = checkstr(message.content)
       if checkthis and checkthis['Username'] != 'ROBLOX':
@@ -162,6 +195,7 @@ def on_message(message):
          infostr = 'Incorrect syntax! Correct usage: `**rbxinfo 261`'
          yield from client.send_message(message.channel, content=infostr)
 
+   # Moderation
    if message.content.startswith('**clean ') and checkowner(message.author):
       pmsg = parse(message.content)
       cmd = pmsg[1]
@@ -187,9 +221,11 @@ def on_message(message):
 
    if message.content.startswith('**exit') and checkowner(message.author):
       print('Logging out...')
+      print('-----------------------------------')
       logmsg = 'Alright <@%s>, logging out.' % message.author.id
       yield from client.send_message(message.channel,content=logmsg)
       yield from client.logout()
+
 
    """if message.content.startswith('**drinktionary'): # UNFINISHED
          embedo=discord.Embed(title="Drinktionary", url=dnkurl, description="Here are the ingredients, please post with which number you want to use. (emoji :one:-:five:)", color=0x832297)
