@@ -1,16 +1,17 @@
-#// init
+#// Mdoules
 import discord
 import asyncio
 import sys
 import os
 import time
-from datetime import datetime, date, time
+import random
+from datetime import datetime, date
 import requests as reqs
 import json
 client = discord.Client()
 
-#/ vars
-TOKEN = 'NDkzMzQxNzgzODc5ODQzODQw.DojvCA.I2F2L6jDhcmt9fzniVwoQREX-ug'
+#// Variables
+TOKEN = 'NDkzMzQxNzgzODc5ODQzODQw.Dosuuw.UVojAXDYaR8MQh50qGrtljNFE8M'
 owner = '213839777840103426'
 api = 'https://api.roblox.com/'
 
@@ -42,26 +43,67 @@ julirl = urls['Pages']['julirl']
 dnkurl = urls['Pages']['dnkurl']
 
 #// Functions
-def checkrbx(msg):
-   presapi = 'https://www.roblox.com/presence/user'
-   usrapi  = 'https://api.roblox.com/users/'
-   if msg[:10] != '**rbxinfo ':
+def printf(string,*argv):
+   print(string % (argv))
+
+def parse(string):
+   return str.split(string)
+
+def ifnum(string,pnt=False):
+   try:
+      float(string)
+      if pnt:
+         printf('%f can become a float',float(string))
+      return True
+   except ValueError:
       return False
 
-   plrid = int(msg[10:])
-   usrreq = reqs.get(usrapi + str(plrid))
-   presreq = reqs.get(presapi,params={'userId': plrid})
 
-   if usrreq.status_code == 200 and presreq.status_code == 200:
-      print('Sending info of id %d...' % plrid)
-      reqjs = usrreq.json()
-      presjs = presreq.json()
-      reqjs['Presence'] = presjs['LastLocation']
-      print(type(reqjs))
-      return reqjs
+def checkstr(msg):
+   presapi = 'https://www.roblox.com/presence/user'
+   usrapi  = 'https://api.roblox.com/users/'
+   nameapi = 'https://api.roblox.com/users/get-by-username'
+   msgpar = parse(msg)
+   
+   param = msgpar[1]
+
+   if ifnum(param):
+      plrid = param
+      usrreq = reqs.get(usrapi + str(plrid))
+      presreq = reqs.get(presapi,params={'userId': plrid})
+
+      if usrreq.status_code == 200 and presreq.status_code == 200:
+         printf ('Sending info of id %s...' % plrid)
+         reqjs = usrreq.json()
+         presjs = presreq.json()
+         reqjs['Presence'] = presjs['LastLocation']
+         print(type(reqjs))
+         return reqjs
+      else:
+         print('User request: %s' % str(usrreq))
+         print('Presence request: %s' % str(presreq))
+         return False
    else:
-      print('User request: %s' % str(usrreq))
-      print('Presence request: %s' % str(presreq))
+      usrreq = reqs.get(nameapi,params={'username': param})
+
+      if usrreq.status_code == 200:
+         reqjs = usrreq.json()
+         plrid = reqjs['Id']
+         presreq = reqs.get(presapi,params={'userId': plrid})
+         print('Sending info of id %s...' % plrid)
+         presjs = presreq.json()
+         reqjs['Presence'] = presjs['LastLocation']
+         print(type(reqjs))
+         return reqjs
+      else:
+         print('User request: %s' % str(usrreq))
+         print('Presence request: %s' % str(presreq))
+         return False
+
+def checkowner(author):
+   if author.id == owner:
+      return True
+   else:
       return False
 
 def getthumb(id):
@@ -105,7 +147,7 @@ def on_message(message):
       yield from client.send_message(message.channel, embed=embedo)
 
    if message.content.startswith('**rbxinfo '):
-      checkthis = checkrbx(message.content)
+      checkthis = checkstr(message.content)
       if checkthis and checkthis['Username'] != 'ROBLOX':
          infostr = '**Username**: %s\n**User ID**: %d' % (checkthis['Username'],checkthis['Id'])
          embed=discord.Embed(title="Quick Info for %s:" % checkthis['Username'], color=0xf02b39)
@@ -120,7 +162,30 @@ def on_message(message):
          infostr = 'Incorrect syntax! Correct usage: `**rbxinfo 261`'
          yield from client.send_message(message.channel, content=infostr)
 
-   if message.content.startswith('**exit') and message.author.id == owner:
+   if message.content.startswith('**clean ') and checkowner(message.author):
+      pmsg = parse(message.content)
+      cmd = pmsg[1]
+      if cmd == 'self':
+         def is_me(m):
+            return m.author == client.user
+         
+         def is_metoo(m):
+            return m.author == message.author
+
+         deltree = yield from client.purge_from(message.channel, limit=100, check=is_metoo)
+         printf('Deleted %d messages. (self)',len(deltree))
+         delmsg2 = '*Deleted %s messages.* (self)' % len(deltree)
+
+         deleted = yield from client.purge_from(message.channel, limit=100, check=is_me)
+         printf('Deleted %d messages. (bot)',len(deleted))
+         delmsg1 = '*Deleted %s messages.* (bot)' % len(deleted)
+
+         snd1 = yield from client.send_message(message.channel,content=delmsg1)
+         snd2 = yield from client.send_message(message.channel,content=delmsg2)
+         time.sleep(float(pmsg[2]))
+         yield from client.delete_messages([snd1,snd2])
+
+   if message.content.startswith('**exit') and checkowner(message.author):
       print('Logging out...')
       logmsg = 'Alright <@%s>, logging out.' % message.author.id
       yield from client.send_message(message.channel,content=logmsg)
