@@ -1,4 +1,4 @@
-#// Mdoules
+#// Modules
 import discord
 import asyncio
 import sys
@@ -11,7 +11,7 @@ import json
 client = discord.Client()
 
 #// Variables
-TOKEN = 'NDkzMzQxNzgzODc5ODQzODQw.Dosuuw.UVojAXDYaR8MQh50qGrtljNFE8M'
+TOKEN = 'NDkzMzQxNzgzODc5ODQzODQw.Do3qWw.Q4x4xDvFdNlnwDCziw9W3bgIIMo'
 owner = '213839777840103426'
 api = 'https://api.roblox.com/'
 
@@ -140,27 +140,28 @@ def on_message(message):
       return
 
    # Normal
-   if message.content.startswith('**hello'):
+   if message.content.startswith('--hello'):
       msg = 'Hey, <@%s>.' % message.author.id
       yield from client.send_message(message.channel, msg)
 
-   if message.content.startswith('**embtest'):
+   if message.content.startswith('--embtest'):
       embedo=discord.Embed( description="Testing embed description.", color=0x832297)
       embedo.set_author(name="Jill", icon_url=julico)
       yield from client.send_message(message.channel, embed=embedo)
 
-   if message.content.startswith('**cmds') or message.content.startswith('**commands'):
-      embedo=discord.Embed(title="Commands", url=dnkurl, description="Here are the commands for N1RV Ann-a v0.2.", color=0x832297)
+   if message.content.startswith('--cmds') or message.content.startswith('--commands'):
+      yield from client.send_typing(message.channel)
+      embedo=discord.Embed(title="Commands", url=dnkurl, description="```Here's the commands for N1RV Ann-a v0.2.```", color=0x832297)
       embedo.set_author(name="Jill", url=julirl, icon_url=julico)
       embedo.set_image(url=mixgif)
-      embedo.add_field(name='**cmds or **commands', value='View the list of available commands.', inline=False)
-      embedo.add_field(name='**hello', value='Basic test command.', inline=False)
-      embedo.add_field(name='**embtest', value='Embed test command.', inline=False)
-      embedo.add_field(name='**chance (int1) (int2)', value='Generates a random value from int1 to int2.', inline=False)
-      embedo.add_field(name='**rbxinfo (userid) or (username)', value='Attempts to find the info of a roblox user with the specified parameter.', inline=True)
+      embedo.add_field(name='--cmds', value='View the list of available commands.', inline=False)
+      embedo.add_field(name='--hello', value='Basic test command.', inline=False)
+      embedo.add_field(name='--embtest', value='Embed test command.', inline=False)
+      embedo.add_field(name='--chance (int1) (int2)', value='Generates a random value from int1 to int2. Usage: `--chance 1 50`', inline=False)
+      embedo.add_field(name='--rbxinfo (userid) or (username)', value='Attempts to find the info of a roblox user with the specified parameter. Usage: `--rbxinfo 261` or `--rbxinfo shedletsky`', inline=True)
       yield from client.send_message(message.channel,embed=embedo)
 
-   if message.content.startswith('**chance '):
+   if message.content.startswith('--chance '):
       chances = parse(message.content)
       authid = message.author.id
       try:
@@ -172,17 +173,18 @@ def on_message(message):
          printf('Random int: %d',newint)
          yield from client.send_message(message.channel,chomsg)
       except ValueError:
-         errmsg = ('<@{}> Please use an integer for your range! Example: `**chance 1 50`').format(authid)
+         errmsg = ('<@{}> Please use an integer for your range! Example: `--chance 1 50`').format(authid)
          yield from client.send_message(message.channel,errmsg)
       except IndexError:
-         errmsg = ('<@{}> Please use an integer for your range! Example: `**chance 1 50`').format(authid)
+         errmsg = ('<@{}> Please use an integer for your range! Example: `--chance 1 50`').format(authid)
          yield from client.send_message(message.channel,errmsg)
 
    # API
-   if message.content.startswith('**rbxinfo '):
+   if message.content.startswith('--rbxinfo '):
+      yield from client.send_typing(message.channel)
       checkthis = checkstr(message.content)
       if checkthis and checkthis['Username'] != 'ROBLOX':
-         infostr = '**Username**: %s\n**User ID**: %d' % (checkthis['Username'],checkthis['Id'])
+         infostr = '--Username--: %s\n--User ID--: %d' % (checkthis['Username'],checkthis['Id'])
          embed=discord.Embed(title="Quick Info for %s:" % checkthis['Username'], color=0xf02b39)
          embed.set_author(name="Jill", url="https://roblox.com/users/" + str(checkthis['Id']), icon_url=julico)
          embed.set_thumbnail(url=getthumb(checkthis['Id']))
@@ -192,11 +194,11 @@ def on_message(message):
          embed.add_field(name='Presence', value=checkthis['Presence'], inline=True)
          yield from client.send_message(message.channel, embed=embed)
       else:
-         infostr = 'Incorrect syntax! Correct usage: `**rbxinfo 261`'
+         infostr = 'Incorrect syntax! Correct usage: `--rbxinfo 261`'
          yield from client.send_message(message.channel, content=infostr)
 
    # Moderation
-   if message.content.startswith('**clean ') and checkowner(message.author):
+   if message.content.startswith('--clean ') and checkowner(message.author):
       pmsg = parse(message.content)
       cmd = pmsg[1]
       if cmd == 'self':
@@ -205,6 +207,8 @@ def on_message(message):
          
          def is_metoo(m):
             return m.author == message.author
+
+         yield from client.send_typing(message.channel)
 
          deltree = yield from client.purge_from(message.channel, limit=100, check=is_metoo)
          printf('Deleted %d messages. (self)',len(deltree))
@@ -219,7 +223,7 @@ def on_message(message):
          time.sleep(float(pmsg[2]))
          yield from client.delete_messages([snd1,snd2])
 
-   if message.content.startswith('**exit') and checkowner(message.author):
+   if message.content.startswith('--exit') and checkowner(message.author):
       print('Logging out...')
       print('-----------------------------------')
       logmsg = 'Alright <@%s>, logging out.' % message.author.id
@@ -227,7 +231,7 @@ def on_message(message):
       yield from client.logout()
 
 
-   """if message.content.startswith('**drinktionary'): # UNFINISHED
+   """if message.content.startswith('--drinktionary'): # UNFINISHED
          embedo=discord.Embed(title="Drinktionary", url=dnkurl, description="Here are the ingredients, please post with which number you want to use. (emoji :one:-:five:)", color=0x832297)
          embedo.set_author(name="Jill", url=julirl, icon_url=julico)
          embedo.set_image(url=mixgif)
