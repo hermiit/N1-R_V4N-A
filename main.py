@@ -11,16 +11,13 @@ import json
 client = discord.Client()
 
 #// Variables
-TOKEN = 'NDkzMzQxNzgzODc5ODQzODQw.Do3qWw.Q4x4xDvFdNlnwDCziw9W3bgIIMo'
+TOKEN = 'NDkzMzQxNzgzODc5ODQzODQw.DpJ5tA.3NsrBR1Ujix4VTDxsBr086eWCAs'
 owner = '213839777840103426'
 api = 'https://api.roblox.com/'
 
-dnums = {
-    ":one:"  : "Adelhyde",
-    ":two:"  : "Bronson Extract",
-    ":three:": "Powdered Delta",
-    ":four:" : "Flanergide",
-    ":five:" : "Karmotrine"
+approved = {
+   '213839777840103426': '213839777840103426', # crabb
+   '481168580541415425': '481168580541415425' # hermit
 }
 
 #/ urls
@@ -103,7 +100,7 @@ def checkstr(msg):
          return False
 
 def checkowner(author):
-   if author.id == owner:
+   if approved[author.id]:
       return True
    else:
       return False
@@ -151,14 +148,21 @@ def on_message(message):
 
    if message.content.startswith('--cmds') or message.content.startswith('--commands'):
       yield from client.send_typing(message.channel)
-      embedo=discord.Embed(title="Commands", url=dnkurl, description="```Here's the commands for N1RV Ann-a v0.2.```", color=0x832297)
+      embedo=discord.Embed(title="Commands", url=dnkurl, description="```Here's the commands for N1RV Ann-a v0.2. Prefix: '--'```", color=0x832297)
       embedo.set_author(name="Jill", url=julirl, icon_url=julico)
       embedo.set_image(url=mixgif)
-      embedo.add_field(name='--cmds', value='View the list of available commands.', inline=False)
-      embedo.add_field(name='--hello', value='Basic test command.', inline=False)
-      embedo.add_field(name='--embtest', value='Embed test command.', inline=False)
-      embedo.add_field(name='--chance (int1) (int2)', value='Generates a random value from int1 to int2. Usage: `--chance 1 50`', inline=False)
-      embedo.add_field(name='--rbxinfo (userid) or (username)', value='Attempts to find the info of a roblox user with the specified parameter. Usage: `--rbxinfo 261` or `--rbxinfo shedletsky`', inline=True)
+      def addcmds():
+         embfile = None
+         with open('cmds.json') as openfile:
+            embfile = json.load(openfile)
+         for i in embfile:
+            print(type(i))
+            if i.get('usage'):
+               descstr = i.get('description') + ("\nUsage: `{}`".format(i.get('usage')))
+               embedo.add_field(name=i.get('command'), value=descstr, inline=False)
+            else:
+               embedo.add_field(name=i.get('command'), value=i.get('description'), inline=False)
+      addcmds()
       yield from client.send_message(message.channel,embed=embedo)
 
    if message.content.startswith('--chance '):
@@ -227,7 +231,9 @@ def on_message(message):
       print('Logging out...')
       print('-----------------------------------')
       logmsg = 'Alright <@%s>, logging out.' % message.author.id
-      yield from client.send_message(message.channel,content=logmsg)
+      sendlog = yield from client.send_message(message.channel,content=logmsg)
+      time.sleep(5) 
+      yield from client.delete_message(message=sendlog)
       yield from client.logout()
 
 
