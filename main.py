@@ -232,7 +232,7 @@ def on_message(message):
       print('-----------------------------------')
       logmsg = 'Alright <@%s>, logging out.' % message.author.id
       sendlog = yield from client.send_message(message.channel,content=logmsg)
-      time.sleep(5) 
+      time.sleep(5)
       yield from client.delete_message(message=sendlog)
       yield from client.logout()
 
