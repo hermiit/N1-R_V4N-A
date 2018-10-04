@@ -15,6 +15,7 @@ client = discord.Client()
 TOKEN = 'NDkzMzQxNzgzODc5ODQzODQw.DpJ5tA.3NsrBR1Ujix4VTDxsBr086eWCAs'
 owner = '213839777840103426'
 api = 'https://api.roblox.com/'
+data = './data/'
 
 approved = {
    '213839777840103426': '213839777840103426', # crabb
@@ -22,7 +23,7 @@ approved = {
 }
 
 #/ urls
-urljs = open('urls.json')
+urljs = open(data+'urls.json')
 urls = json.load(urljs)
 
 mixgif = urls['Media']['mixgif']
@@ -125,7 +126,7 @@ def primgrp(id):
 #/ EXP
 def addxp(user):
    usdict = None
-   with open('users.json') as users:
+   with open(data+'users.json') as users:
       usdict = json.load(users)
       id = user.id
       if id in usdict:
@@ -143,12 +144,12 @@ def addxp(user):
             'cap': 3,
             'name': user.name
          }
-   with open('users.json', 'w') as users:
+   with open(data+'users.json', 'w') as users:
       json.dump(usdict,users,sort_keys=True,indent=3)
 
 def xparray(id):
    usdict = None
-   with open('users.json') as users:
+   with open(data+'users.json') as users:
       usdict = json.load(users)
    try:
       lvl = usdict[id]['lvl']
@@ -176,7 +177,7 @@ def on_message(message):
       embedo.set_image(url=mixgif)
       def addcmds():
          embfile = None
-         with open('cmds.json') as openfile:
+         with open(data+'cmds.json') as openfile:
             embfile = json.load(openfile)
          for i in embfile:
             print(type(i))
