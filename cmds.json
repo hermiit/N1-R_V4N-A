@@ -1,20 +1,17 @@
 [
    {
       "command"    : "--cmds",
-      "description": "View the list of available commands."
-   },
-   {
-      "command"    : "--hello",
-      "description": "Basic test command."
-   },
-   {
-      "command"    : "--embtest",
-      "description": "Post a basic embed."
+      "description": "Posts this list."
    },
    {
       "command"    : "--chance (int1) (int2)",
       "description": "Generates a random value from int1 to int2.",
       "usage"      : "--chance 1 50"
+   },
+   {
+      "command"    : "--levels <optional discord ID>",
+      "description": "Posts the level info of yourself, or another user by inputting their discord ID.",
+      "usage"      : "--levels 481168580541415425"
    },
    {
       "command"    : "--rbxinfo (username or userid)",

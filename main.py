@@ -22,20 +22,12 @@ approved = {
 }
 
 #/ urls
-urls = {
-   "Media": {
-      "mixgif": "https://vignette.wikia.nocookie.net/va11halla/images/5/51/Mixing.gif",
-      "julico": "https://cdn.discordapp.com/avatars/488107922086428673/ac74d4af50b36a915400bcb648addb8a.png"
-   },
-   "Pages": {
-      "testu" : "https://google.com",
-      "julirl": "http://va11halla.wikia.com/wiki/Julianne_Stingray",
-      "dnkurl": "http://va11halla.wikia.com/wiki/Drinktionary"
-   }
-}
+urljs = open('urls.json')
+urls = json.load(urljs)
 
 mixgif = urls['Media']['mixgif']
 julico = urls['Media']['julico']
+bossico = urls['Media']['bossico']
 testu = urls['Pages']['testu']
 julirl = urls['Pages']['julirl']
 dnkurl = urls['Pages']['dnkurl']
@@ -130,12 +122,15 @@ def primgrp(id):
    else:
       return False
 
-def addxp(id):
+#/ EXP
+def addxp(user):
    usdict = None
    with open('users.json') as users:
       usdict = json.load(users)
+      id = user.id
       if id in usdict:
          usdict[id]['exp'] += 1
+         usdict[id]['name'] = user.name
          usdict[id]['cap'] = round( 0.04 * (pow(usdict[id]['lvl'],3)) + 0.8 * (pow(usdict[id]['lvl'],2)) + 2 * usdict[id]['lvl'])
          if usdict[id]['exp'] >= usdict[id]['cap']:
             usdict[id]['lvl'] += 1
@@ -145,10 +140,24 @@ def addxp(id):
          usdict[id] = {
             'exp': 0,
             'lvl': 1,
-            'cap': 10
+            'cap': 3,
+            'name': user.name
          }
    with open('users.json', 'w') as users:
       json.dump(usdict,users,sort_keys=True,indent=3)
+
+def xparray(id):
+   usdict = None
+   with open('users.json') as users:
+      usdict = json.load(users)
+   try:
+      lvl = usdict[id]['lvl']
+      exp = usdict[id]['exp']
+      cap = usdict[id]['cap']
+
+      return [exp,lvl,cap]
+   except KeyError:
+      return False
 
 #// main
 @client.async_event
@@ -157,18 +166,9 @@ def on_message(message):
    if message.author == client.user:
       return
 
-   addxp(message.author.id)
+   addxp(message.author)
 
    # Normal
-   if message.content.startswith('--hello'):
-      msg = 'Hey, <@%s>.' % message.author.id
-      yield from client.send_message(message.channel, msg)
-
-   if message.content.startswith('--embtest'):
-      embedo=discord.Embed( description="Testing embed description.", color=0x832297)
-      embedo.set_author(name="Jill", icon_url=julico)
-      yield from client.send_message(message.channel, embed=embedo)
-
    if message.content.startswith('--cmds') or message.content.startswith('--commands'):
       yield from client.send_typing(message.channel)
       embedo=discord.Embed(title="Commands", url=dnkurl, description="```Here's the commands for N1RV Ann-a v0.2. Prefix: '--'```", color=0x832297)
@@ -256,9 +256,10 @@ def on_message(message):
          delmsg = '*Deleted {} messages.*'.format(len(deltree))
          printf(delmsg)
          
-         snd = yield from client.send_message(message.channel,content=delmsg)
-         time.sleep(float(pmsg[2]))
-         yield from client.delete_message(snd)
+         if len(pmsg) > 2:
+            snd = yield from client.send_message(message.channel,content=delmsg)
+            time.sleep(float(pmsg[2]))
+            yield from client.delete_message(snd)
 
    if message.content.startswith('--exit') and checkowner(message.author):
       yield from client.delete_message(message)
@@ -271,7 +272,44 @@ def on_message(message):
       yield from client.logout()
 
    # Levels
-   
+   if message.content.startswith('--levels'):
+      yield from client.send_typing(message.channel)
+      
+      msgpars = parse(message.content)
+      if len(msgpars) > 1:
+         usrid = msgpars[1]
+         userarr = xparray(usrid)
+         if userarr:
+            exp = userarr[0]
+            lvl = userarr[1]
+            cap = userarr[2]
+
+            embedo=discord.Embed(title='Level info for <@{}>:'.format(usrid), color=0x934ac4)
+            embedo.add_field(name='*EXP*', value=str(exp), inline=True)
+            embedo.add_field(name='*Level*', value=str(lvl), inline=True)
+            embedo.add_field(name='*EXP until next level*', value='({0} / {1})'.format(exp,cap), inline=True)
+            embedo.set_footer(text='N1RV Ann-a 0.3 | ' + str(datetime.utcnow()),icon_url = bossico)
+            yield from client.send_message(message.channel,embed=embedo)
+         else:
+            errmsg = 'User <@{}> has no level! Maybe they haven\'t posted recently?'.format(usrid)
+
+            yield from client.send_message(message.channel,errmsg)
+      else:
+         usrid = message.author.id
+         userarr = xparray(usrid)
+         exp = userarr[0]
+         lvl = userarr[1]
+         cap = userarr[2]
+
+         embedo=discord.Embed(title='Stats:', color=0x934ac4)
+         embedo.set_author(name="Jill", url=julirl, icon_url=julico)
+         embedo.add_field(name='*EXP*', value=str(exp), inline=False)
+         embedo.add_field(name='*Level*', value=str(lvl), inline=False)
+         embedo.add_field(name='*EXP until next level*', value='({0} / {1})'.format(exp,cap), inline=False)
+         embedo.set_footer(text='N1RV Ann-a 0.3 | ' + str(datetime.utcnow()),icon_url = bossico)
+         yield from client.send_message(message.channel,content=('Level info for <@{}>:'.format(usrid)),embed=embedo)
+         
+
 
 
 
