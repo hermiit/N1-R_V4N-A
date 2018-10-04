@@ -5,6 +5,7 @@ import sys
 import os
 import time
 import random
+import math
 from datetime import datetime, date
 import requests as reqs
 import json
@@ -129,12 +130,34 @@ def primgrp(id):
    else:
       return False
 
+def addxp(id):
+   usdict = None
+   with open('users.json') as users:
+      usdict = json.load(users)
+      if id in usdict:
+         usdict[id]['exp'] += 1
+         usdict[id]['cap'] = round( 0.04 * (pow(usdict[id]['lvl'],3)) + 0.8 * (pow(usdict[id]['lvl'],2)) + 2 * usdict[id]['lvl'])
+         if usdict[id]['exp'] >= usdict[id]['cap']:
+            usdict[id]['lvl'] += 1
+            usdict[id]['cap'] = round( 0.04 * (pow(usdict[id]['lvl'],3)) + 0.8 * (pow(usdict[id]['lvl'],2)) + 2 * usdict[id]['lvl'])
+            usdict[id]['exp'] = 0
+      else:
+         usdict[id] = {
+            'exp': 0,
+            'lvl': 1,
+            'cap': 10
+         }
+   with open('users.json', 'w') as users:
+      json.dump(usdict,users,sort_keys=True,indent=3)
+
 #// main
 @client.async_event
 def on_message(message):
    # we do not want the bot to reply to itself
    if message.author == client.user:
       return
+
+   addxp(message.author.id)
 
    # Normal
    if message.content.startswith('--hello'):
@@ -248,7 +271,7 @@ def on_message(message):
       yield from client.logout()
 
    # Levels
-
+   
 
 
 
