@@ -173,7 +173,7 @@ def on_message(message):
          cho2 = int(chances[2])
          
          newint = random.randint(cho1,cho2)
-         chomsg = ('<@{}> `Selected: {}`').format(authid,newint)
+         chomsg = ('<@{}> :8ball: `Selected: {}`').format(authid,newint)
          printf('Random int: %d',newint)
          yield from client.send_message(message.channel,chomsg)
       except ValueError:
@@ -226,30 +226,29 @@ def on_message(message):
          snd2 = yield from client.send_message(message.channel,content=delmsg2)
          time.sleep(float(pmsg[2]))
          yield from client.delete_messages([snd1,snd2])
+      elif cmd == 'all':
+         yield from client.send_typing(message.channel)
+
+         deltree = yield from client.purge_from(message.channel, limit=5000)
+         delmsg = '*Deleted {} messages.*'.format(len(deltree))
+         printf(delmsg)
+         
+         snd = yield from client.send_message(message.channel,content=delmsg)
+         time.sleep(float(pmsg[2]))
+         yield from client.delete_message(snd)
 
    if message.content.startswith('--exit') and checkowner(message.author):
+      yield from client.delete_message(message)
       print('Logging out...')
       print('-----------------------------------')
       logmsg = 'Alright <@%s>, logging out.' % message.author.id
       sendlog = yield from client.send_message(message.channel,content=logmsg)
-      time.sleep(5)
+      time.sleep(2)
       yield from client.delete_message(message=sendlog)
       yield from client.logout()
 
+   # Levels
 
-   """if message.content.startswith('--drinktionary'): # UNFINISHED
-         embedo=discord.Embed(title="Drinktionary", url=dnkurl, description="Here are the ingredients, please post with which number you want to use. (emoji :one:-:five:)", color=0x832297)
-         embedo.set_author(name="Jill", url=julirl, icon_url=julico)
-         embedo.set_image(url=mixgif)
-         embedo.add_field(name=(1), value="Adelhyde", inline=True)
-         embedo.add_field(name=(2), value="Bronson Extract", inline=True)
-         embedo.add_field(name=(3), value="Powdered Delta", inline=True)
-         embedo.add_field(name=(4), value="Flanergide", inline=True)
-         embedo.add_field(name=(5), value="Karmotrine", inline=True)
-         embedo.set_footer(icon_url=julico,text='Generated via N1-R V4N-A | ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-         yield from client.send_message(message.channel, embed=embedo)
-         res = client.wait_for_message(author=message.author,content='1')
-         yield from client.send_message(message.channel,content=res.content)"""
 
 
 
